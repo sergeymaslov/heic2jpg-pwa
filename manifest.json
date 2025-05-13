@@ -1,10 +1,10 @@
 {
     "name": "heic2jpg",
     "short_name": "heic2jpg",
-    "description": "",
+    "description": "Приложение для конвертации HEIC в JPG",
     "theme_color": "#03a9f4",
     "background_color": "#5a0fc8",
-    "display": "fullscreen",
+    "display": "standalone",
     "orientation": "portrait",
     "scope": "/heic2jpg-pwa/",
     "start_url": "/heic2jpg-pwa/",
