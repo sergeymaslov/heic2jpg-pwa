@@ -1,4 +1,4 @@
-importScripts("/workbox-sw.js");
+importScripts("workbox-sw.js");
 
 workbox.setConfig({ debug: false });
 
