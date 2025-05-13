@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>HEIC 2 JPG</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#03a9f4" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="google" content="notranslate" />
+
+    <link rel="preload" href="/manifest.json" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Apple touch icon -->
+    <link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-touch-icon_120.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon_180.png" />
+
+    <!-- Подключаем heic2any -->
+    <script src="/heic2any.min.js"></script>
+    <style>
+        :root {
+            --primary: #6200ee;
+            --primary-dark: #3700b3;
+            --secondary: #03dac6;
+            --error: #b00020;
+            --surface: #ffffff;
+            --background: #f5f5f5;
+            --on-primary: #ffffff;
+            --on-secondary: #000000;
+            --on-error: #ffffff;
+            --on-surface: #000000;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        @font-face {
+            font-family: 'Material Icons';
+            font-style: normal;
+            font-weight: 400;
+            src: url(/material_icons.woff2) format('woff2');
+        }
+
+        .material-icons {
+            font-family: 'Material Icons';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background);
+            color: var(--on-surface);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: var(--on-primary);
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-left: 16px;
+        }
+
+        main {
+            flex: 1;
+            padding: 80px 16px 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .card {
+            background-color: var(--surface);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+        }
+
+        .file-upload {
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .file-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            top: 0;
+            left: 0;
+            cursor: pointer;
+        }
+
+        .file-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .file-label:hover {
+            border-color: var(--primary);
+            background-color: rgba(98, 0, 238, 0.04);
+        }
+
+        .file-label i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+
+        .file-label span {
+            font-size: 1rem;
+            color: var(--on-surface);
+        }
+
+        .file-label .hint {
+            font-size: 0.875rem;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            border-radius: 4px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        .button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .button i {
+            margin-right: 8px;
+        }
+
+        .button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .status-message {
+            padding: 16px;
+            border-radius: 4px;
+            margin: 16px 0;
+            display: none;
+        }
+
+        .error {
+            background-color: #ffebee;
+            color: var(--error);
+            display: block;
+        }
+
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            display: block;
+        }
+
+        .preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .preview-item {
+            position: relative;
+            width: calc(50% - 8px);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .preview-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 0.875rem;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            .preview-item {
+                width: 100%;
+            }
+
+            .header-title {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- <header>
+        <div class="header-content">
+            <i class="material-icons">image</i>
+            <h1 class="header-title">HEIC to JPG Converter</h1>
+        </div>
+    </header> -->
+
+    <main>
+        <div class="card">
+            <h2>Конвертация HEIC в JPG</h2>
+
+            <div class="file-upload">
+                <input type="file" id="fileInput" class="file-input" accept=".heic,.heif">
+                <label for="fileInput" class="file-label">
+                    <i class="material-icons">cloud_upload</i>
+                    <span>Нажмите или перетащите файл HEIC</span>
+                    <span class="hint">Поддерживаются только файлы формата HEIC (.heic,.heif)</span>
+                </label>
+            </div>
+
+            <div id="statusMessage" class="status-message"></div>
+        </div>
+
+    </main>
+    <footer>
+        <p>Maslov's HEIC Converter &copy; 2025 | Работает в браузере</p>
+    </footer>
+
+    <script>
+
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message ' + type;
+        }
+
+        // Обработка файла через heic2any
+        document.getElementById('fileInput').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Конвертация через JS-библиотеку
+            const convertedBlob = await heic2any({
+                blob: file,
+                toType: 'image/jpeg',
+                quality: 0.8
+            });
+
+            // Скачивание результата
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(convertedBlob);
+            link.download = file.name.replace(/\.[^.]+$/, '.jpg');
+            link.click();
+        });
+
+        // Обработка drag and drop
+        const dropArea = document.querySelector('.file-label');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropArea.classList.add('highlight');
+        }
+
+        function unhighlight() {
+            dropArea.classList.remove('highlight');
+        }
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            if (files.length) {
+                fileInput.files = files;
+                const event = new Event('change');
+                fileInput.dispatchEvent(event);
+            }
+        }
+
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function () {
+                navigator.serviceWorker
+                    .register("/serviceWorker.js")
+                    .then((registration) => {
+                        console.log("SW registration successful");
+                    });
+            });
+        }
+    </script>
+</body>
+
+</html>
