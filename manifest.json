@@ -6,8 +6,8 @@
     "background_color": "#5a0fc8",
     "display": "fullscreen",
     "orientation": "portrait",
-    "scope": "/",
-    "start_url": "/",
+    "scope": "/heic2jpg-pwa/",
+    "start_url": "/heic2jpg-pwa/",
     "icons": [
         {
             "src": "icons/icon_192.png",
