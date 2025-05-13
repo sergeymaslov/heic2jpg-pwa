@@ -1,4 +1,5 @@
 {
+    "id": "v2"
     "name": "heic2jpg",
     "short_name": "heic2jpg",
     "description": "Приложение для конвертации HEIC в JPG",
