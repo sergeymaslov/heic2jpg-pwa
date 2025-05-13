@@ -10,7 +10,7 @@ const {
     precaching: { matchPrecache, precacheAndRoute },
 } = workbox;
 
-precacheAndRoute([{ url: "/offline.html", revision: null }]);
+precacheAndRoute([{ url: "offline.html", revision: null }]);
 
 // Cache page navigations (html) with a Network First strategy
 registerRoute(
